@@ -1,0 +1,160 @@
+{
+  "name": "Tugas Pertemuan 3 - Pengembangan Agen AI",
+  "nodes": [
+    {
+      "parameters": {
+        "public": true,
+        "initialMessages": "Halo! 👋\nSaya chatbot AI NF Academy. Saya dapat membantu informasi produk pelatihan dan harganya.",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.5,
+      "position": [
+        0,
+        0
+      ],
+      "id": "6b1562e7-c802-40e2-90b6-ed66d42cc406",
+      "name": "When chat message received",
+      "webhookId": "c169a4ba-1f13-4526-99ae-bc15d23ab9b3"
+    },
+    {
+      "parameters": {
+        "options": {
+          "systemMessage": "Kamu adalah agen AI untuk memberikan informasi produk pelatihan dan harga di NF Academy (NFA), berdasarkan data Google Sheets. Produk yang tersedia meliputi Digital Marketing, Networking, Web Developer, Mobile Programming, DevOps Engineer, Codeless Data Science, dan AI.\n\nJika pengguna hanya menyapa seperti \"Halo\", \"Hai\", atau \"Hello\", jawab sesuai dengan:\n\n\"Halo! Selamat datang di layanan chatbot NF Academy (NFA).\n\nSaya siap membantu memberikan informasi mengenai nama produk, kategori, dan harga pelatihan yang tersedia di NFA, seperti Digital Marketing, Networking, Web Developer, Mobile Programming, DevOps Engineer, Codeless Data Science, dan AI.\n\nAda informasi produk atau harga pelatihan yang ingin Kamu tanyakan?\n\nTerima kasih telah menggunakan chatbot kami.\"\n\nUntuk pertanyaan produk, kategori, atau harga, gunakan tool \"Get row(s) in sheet in Google Sheets\" dan jawab hanya berdasarkan data tersebut. Jangan mengarang informasi. Jika produk tidak ditemukan, sampaikan bahwa produk tersebut tidak tersedia.\n\nJika pengguna hanya menyebut kata kunci atau sebagian nama produk, gunakan kata tersebut untuk mencari produk yang paling sesuai melalui Google Sheets Tool. Jika terdapat beberapa kemungkinan, minta pengguna memperjelas produk yang dimaksud.\n\nUntuk pertanyaan di luar produk dan harga, sampaikan bahwa kamu hanya membantu informasi produk pelatihan dan harga di Google Sheets.  "
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        288,
+        0
+      ],
+      "id": "0b233d9b-df38-49c3-9b3a-7a679905a792",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.4,
+      "position": [
+        368,
+        224
+      ],
+      "id": "ba8e6d3e-b651-4d59-8ac2-cf48a13b2d2a",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1SKrawBtE49AJ3YReeYaOKAGafZuKQPfENvr2U9KtfME",
+          "mode": "list",
+          "cachedResultName": "n8n 1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1SKrawBtE49AJ3YReeYaOKAGafZuKQPfENvr2U9KtfME/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1SKrawBtE49AJ3YReeYaOKAGafZuKQPfENvr2U9KtfME/edit#gid=0"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.7,
+      "position": [
+        512,
+        224
+      ],
+      "id": "6363183b-1584-4334-84f9-cc81b07d9005",
+      "name": "Get row(s) in sheet in Google Sheets",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "VnNZj3xuNU81Hfjj",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-3.6-flash",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1.1,
+      "position": [
+        224,
+        208
+      ],
+      "id": "d3bf0906-3ccc-4eeb-86a3-297bf9174ade",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "Yg24nRtXc4HcXSUD",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet in Google Sheets": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "eb1ac70f-4db7-45b8-b85c-57ed22770777",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "dc96f10ae7dc95d3c138575ba243a0a167923dbcb524841d451aadf9135d5fb3"
+  },
+  "nodeGroups": [],
+  "id": "k1VqpS19t5Ayitcu",
+  "tags": []
+}
